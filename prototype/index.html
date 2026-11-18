@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Firas Djebbi — prototype (hero + first bento row)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mona+Sans:wdth,wght@75..125,300..800&family=IBM+Plex+Sans+Arabic:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05070B; --hi:#E6EDF3; --mid:#94A3B8;
+  --cyan:#22D3EE; --blue:#3B82F6; --teal:#2DD4BF;
+  --glass:rgba(148,163,184,.05); --line:rgba(255,255,255,.08);
+  --r-card:28px; --pad:28px; --r-in:max(calc(var(--r-card) - var(--pad)),12px);
+  --ease:cubic-bezier(.16,1,.3,1);
+  --font:"Mona Sans",system-ui,sans-serif;
+  --px:0px; --py:0px; --scroll:0;
+}
+*{box-sizing:border-box;margin:0}
+html{color-scheme:dark}
+body{background:var(--bg);color:var(--hi);font:400 1.0625rem/1.6 var(--font);font-stretch:100%;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden}
+a,button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:8px}
+
+/* depth: blueprint grid, light fields, grain */
+.bg{position:fixed;inset:0;z-index:-1;pointer-events:none}
+.bg .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(148,163,184,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.06) 1px,transparent 1px);background-size:56px 56px;-webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 35%,#000 20%,transparent 75%);mask-image:radial-gradient(ellipse 70% 60% at 50% 35%,#000 20%,transparent 75%)}
+.bg .field{position:absolute;width:60vw;height:60vw;border-radius:50%;filter:blur(110px);opacity:.09;will-change:transform}
+.bg .f1{background:var(--cyan);left:-15vw;top:-20vw;transform:translateY(calc(var(--scroll)*-40px))}
+.bg .f2{background:var(--blue);right:-20vw;top:10vw;transform:translateY(calc(var(--scroll)*30px))}
+.bg .grain{position:absolute;inset:0;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+.wrap{max-width:1180px;margin-inline:auto;padding-inline:max(16px,env(safe-area-inset-left))}
+.brand{display:flex;align-items:baseline;gap:.75rem;padding-block:28px;font-weight:600;font-stretch:112%;letter-spacing:-.01em}
+.sig{font:500 .9rem "IBM Plex Sans Arabic",var(--font);color:var(--mid)}
+
+/* hero */
+.hero{padding-block:clamp(24px,6vw,72px) 24px}
+h1{font-size:clamp(3rem,8vw,7rem);line-height:.98;letter-spacing:-.035em;font-weight:620;font-stretch:108%;max-width:14ch;text-wrap:balance}
+.line{display:block;overflow:hidden;padding-bottom:.08em}
+.line>span{display:block;transform:translateY(105%);animation:rise .8s var(--ease) forwards;animation-delay:calc(.25s + var(--i)*.07s)}
+@keyframes rise{to{transform:none}}
+.fade{opacity:0;transform:translateY(12px);animation:up .6s var(--ease) forwards;animation-delay:var(--d,.6s)}
+@keyframes up{to{opacity:1;transform:none}}
+.lede{margin-top:28px;max-width:46ch;color:var(--mid);font-size:1.125rem}
+.lede b{color:var(--hi);font-weight:560}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px;list-style:none;padding:0}
+.chip{border:1px solid var(--line);background:var(--glass);border-radius:999px;padding:6px 14px;font-size:.9rem;color:var(--hi)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.btn{display:inline-flex;align-items:center;min-height:48px;padding:0 24px;border-radius:999px;text-decoration:none;font-weight:560;border:1px solid var(--line);transition:background .2s,border-color .2s}
+.btn.primary{background:var(--cyan);color:var(--bg);border-color:var(--cyan)}
+.btn.primary:hover{background:#67E3F5}
+.btn.ghost:hover{border-color:rgba(34,211,238,.6)}
+
+/* DAG */
+.dag{margin-top:48px;position:relative}
+.dag svg{width:100%;height:auto;display:block;overflow:visible}
+.dag .layer{transform:translate(var(--px),var(--py));transition:transform .35s var(--ease)}
+.edge{fill:none;stroke:var(--mid);stroke-opacity:.35;stroke-width:1.5;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1s var(--ease) forwards;animation-delay:calc(.9s + var(--k)*.04s);transition:stroke-opacity .25s}
+.edge.b{stroke:var(--blue);stroke-opacity:.5}
+@keyframes draw{to{stroke-dashoffset:0}}
+.node{opacity:0;animation:up .5s var(--ease) forwards;animation-delay:calc(.8s + var(--c)*.12s);cursor:default;transition:opacity .25s}
+.node rect{fill:rgba(14,20,30,.9);stroke:var(--line);stroke-width:1;transition:stroke .2s}
+.node text{fill:var(--hi);font:500 12.5px var(--font);text-anchor:middle;dominant-baseline:central}
+.node text.sub{fill:var(--mid);font-size:10.5px}
+.node:focus{outline:none}
+.node:focus-visible rect{stroke:var(--cyan);stroke-width:2}
+.node.lit rect{stroke:var(--cyan);stroke-opacity:.9}
+.dag.hl .dim{opacity:.18!important}
+.dag.hl .edge.lit{stroke:var(--cyan);stroke-opacity:.9}
+.pkt{fill:var(--cyan)} .pkt.b{fill:#7FB0FF}
+.dag.hl .pkt{opacity:0}.dag.hl .lit .pkt,.dag.hl .pkt.lit{opacity:1}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.hint{margin-top:12px;color:var(--mid);font-size:.9rem}
+
+/* bento */
+.bento{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-block:96px}
+.card{position:relative;border-radius:var(--r-card);padding:var(--pad);background:var(--glass);border:1px solid var(--line);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);overflow:hidden;isolation:isolate;opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.card.in{opacity:1;transform:none;transition-delay:calc(var(--n)*60ms)}
+.card::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%),rgba(34,211,238,.85),transparent 65%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:var(--near,0);pointer-events:none;transition:opacity .2s}
+.card::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(360px circle at var(--mx,50%) var(--my,50%),rgba(34,211,238,.09),transparent 65%);opacity:calc(var(--near,0)*var(--hov,.5));pointer-events:none}
+.card.hov{--hov:1}
+.A{grid-column:span 2;grid-row:span 2}.B{grid-column:span 2}.C{grid-column:span 2;--tx:0deg;--ty:0deg}
+h2{font-size:1.5625rem;line-height:1.15;letter-spacing:-.02em;font-weight:600;font-stretch:106%;max-width:20ch}
+.card p{color:var(--mid);margin-top:14px;max-width:62ch}
+.card p b{color:var(--hi);font-weight:560}
+.open{margin-top:22px;background:none;border:1px solid var(--line);border-radius:999px;min-height:44px;padding:0 20px;cursor:pointer;transition:border-color .2s}
+.open:hover{border-color:rgba(34,211,238,.6)}
+/* mini architecture (A) */
+.mini{display:flex;align-items:center;gap:0;margin-top:26px;flex-wrap:wrap;row-gap:10px}
+.mini .n{border:1px solid var(--line);border-radius:var(--r-in);padding:6px 12px;font-size:.82rem;background:rgba(5,7,11,.5);white-space:nowrap}
+.mini .e{width:22px;height:2px;background:linear-gradient(90deg,var(--mid),var(--mid));opacity:.3;position:relative;overflow:hidden;transition:opacity .3s}
+.mini .e::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--cyan),transparent);transform:translateX(-100%)}
+.A:hover .mini .e{opacity:1}
+.A:hover .mini .e::after{animation:sweep .9s var(--ease) forwards;animation-delay:calc(var(--s)*110ms)}
+@keyframes sweep{to{transform:translateX(100%)}}
+/* B: stage DAG + counter */
+.stat{display:flex;align-items:baseline;gap:12px;margin-top:6px}
+.num{font:600 clamp(3rem,6vw,4.5rem)/1 var(--font);font-variant-numeric:tabular-nums;letter-spacing:-.04em;font-stretch:108%}
+.tasks{display:flex;align-items:center;margin-top:22px;flex-wrap:wrap;row-gap:8px}
+.task{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:var(--r-in);padding:6px 12px;font-size:.82rem;background:rgba(5,7,11,.5);transition:border-color .25s,color .25s}
+.task i{width:8px;height:8px;border-radius:50%;background:var(--mid);opacity:.5;transition:background .25s,opacity .25s}
+.task.ok{border-color:rgba(45,212,191,.5)}.task.ok i{background:var(--teal);opacity:1}
+.tasks .e{width:14px;height:1px;background:var(--mid);opacity:.35}
+.small{font-size:.85rem;color:var(--mid);margin-top:10px}
+/* C: certs */
+.certs{list-style:none;padding:0;display:grid;gap:10px;margin-top:20px;perspective:700px}
+.cert{--sx:50%;border:1px solid var(--line);border-radius:var(--r-in);padding:14px 16px;position:relative;overflow:hidden;background:rgba(5,7,11,.45);transform:rotateX(var(--tx)) rotateY(var(--ty));transition:transform .25s var(--ease)}
+.cert::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent calc(var(--sx) - 22%),rgba(34,211,238,.18) var(--sx),rgba(59,130,246,.14) calc(var(--sx) + 10%),transparent calc(var(--sx) + 28%));mix-blend-mode:screen;opacity:0;transition:opacity .25s;pointer-events:none}
+.cert:hover::after{opacity:1}
+.cert b{display:block;font-weight:580}.cert span{color:var(--mid);font-size:.85rem}
+
+@media (max-width:900px){.bento{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.bento{grid-template-columns:1fr;margin-block:64px}.A,.B,.C{grid-column:auto;grid-row:auto}.card{--pad:22px}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.15s!important;transition-delay:0s!important}
+  .line>span{transform:none}.fade,.node{opacity:1;transform:none}.edge{stroke-dashoffset:0}.card{transform:none}.pkt{display:none}
+  .bg .f1,.bg .f2{transform:none}.cert{transform:none!important}
+}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><div class="grid"></div><div class="field f1"></div><div class="field f2"></div><div class="grain"></div></div>
+
+<div class="wrap">
+  <div class="brand"><span>Firas Djebbi</span><span class="sig" lang="ar" dir="rtl">فراس الدجبي</span></div>
+
+  <header class="hero" id="hero">
+    <h1>
+      <span class="line"><span style="--i:0">Legacy data</span></span>
+      <span class="line"><span style="--i:1">platforms, rebuilt</span></span>
+      <span class="line"><span style="--i:2">on Google Cloud.</span></span>
+    </h1>
+    <p class="lede fade" style="--d:.6s">Firas Djebbi is an <b>enterprise data engineer</b> in Riyadh. I trace the lineage of legacy BI and move it to BigQuery for a national utility.</p>
+    <ul class="chips fade" style="--d:.68s" aria-label="Certifications">
+      <li class="chip">Google Cloud Professional Data Engineer</li>
+      <li class="chip">SnowPro Core</li>
+      <li class="chip">SnowPro Advanced: Data Engineer</li>
+    </ul>
+    <div class="actions fade" style="--d:.76s">
+      <a class="btn primary" href="#contact">Email me</a>
+      <a class="btn ghost" href="#cv">Download CV (PDF)</a>
+    </div>
+
+    <div class="dag" id="dag">
+      <svg id="dagsvg" role="group" aria-labelledby="dagtitle"><title id="dagtitle">Data platform architecture, sources to BI</title><g class="layer" id="layer"></g></svg>
+      <ol class="sr" id="dagtext"></ol>
+      <p class="hint fade" style="--d:2s">Hover or focus a system to trace its lineage.</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="bento" id="grid">
+      <section class="card A" style="--n:0" aria-labelledby="a-t">
+        <h2 id="a-t">Moving a legacy BI estate to BigQuery</h2>
+        <p>A multi-year enterprise data transformation at National Water Company, through Devoteam. I <b>trace the SSIS lineage</b> behind legacy business reports and write source-to-target mappings between SQL Server and BigQuery types.</p>
+        <p>I also land legacy XML and Oracle sources in BigQuery through SQL staging, <b>reconciling row counts and values</b> against the source.</p>
+        <div class="mini" aria-hidden="true">
+          <span class="n">Oracle · XML</span><span class="e" style="--s:0"></span>
+          <span class="n">SQL staging</span><span class="e" style="--s:1"></span>
+          <span class="n">BigQuery</span><span class="e" style="--s:2"></span>
+          <span class="n">Looker</span>
+        </div>
+        <button class="open" type="button">Open case study</button>
+      </section>
+
+      <section class="card B" style="--n:1" aria-labelledby="b-t">
+        <h2 id="b-t">Autobiz: faster production pipelines</h2>
+        <div class="stat"><span class="num" id="count" aria-label="40 percent">0%</span><span class="small" style="margin:0">higher processing throughput</span></div>
+        <p style="margin-top:8px">Python, SQL and PySpark on GCP. 15+ source systems unified under standard schemas (30% faster acquisition), and runtime cut by 20% with no loss of accuracy.</p>
+        <div class="tasks" id="tasks" aria-hidden="true"></div>
+        <button class="open" type="button">Open case study</button>
+      </section>
+
+      <section class="card C" style="--n:2" aria-labelledby="c-t">
+        <h2 id="c-t">Certifications</h2>
+        <ul class="certs">
+          <li class="cert"><b>Professional Data Engineer</b><span>Google Cloud</span></li>
+          <li class="cert"><b>SnowPro Core</b><span>Snowflake</span></li>
+          <li class="cert"><b>SnowPro Advanced: Data Engineer</b><span>Snowflake</span></li>
+        </ul>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const coarse = matchMedia("(hover: none)").matches;
+
+/* ---------- Living DAG ---------- */
+// col = pipeline stage, t = position across the stage (0..1)
+const N = [
+ {id:"ora",l:"Oracle",c:0,t:0},{id:"pg",l:"PostgreSQL",c:0,t:.5},{id:"ssis",l:"SQL Server / SSIS",c:0,t:1},
+ {id:"ds",l:"Datastream",s:"CDC",c:1,t:.25},{id:"df",l:"Cloud Data Fusion",c:1,t:.85},
+ {id:"bq",l:"BigQuery",s:"bronze → silver",c:2,t:.5},
+ {id:"dfm",l:"Dataform",c:3,t:.5},{id:"at",l:"AtScale",s:"semantic layer",c:4,t:.5},
+ {id:"lk",l:"Looker",c:5,t:.2},{id:"pbi",l:"Power BI",c:5,t:.8}];
+// Source→ingestion routing is a placeholder until confirmed (see proposal, question 2)
+const E = [["ora","ds"],["pg","ds"],["ssis","df"],["ds","bq"],["df","bq"],["bq","dfm"],["dfm","at"],["at","lk"],["at","pbi"]];
+const svg = document.getElementById("dagsvg"), layer = document.getElementById("layer"), dag = document.getElementById("dag");
+const NS = "http://www.w3.org/2000/svg";
+const el = (n,a={},p)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);p&&p.appendChild(e);return e};
+const up = id => E.filter(e=>e[1]===id).map(e=>e[0]), down = id => E.filter(e=>e[0]===id).map(e=>e[1]);
+const walk = (id,f,s=new Set())=>{f(id).forEach(n=>{if(!s.has(n)){s.add(n);walk(n,f,s)}});return s};
+let vertical = null;
+
+function build(){
+  const v = innerWidth < 760; if (v === vertical) return; vertical = v;
+  layer.textContent = "";
+  const W = v?110:128, H = 44;
+  svg.setAttribute("viewBox", v ? "0 0 360 640" : "0 0 1000 340");
+  const pos = id => { const n=N.find(x=>x.id===id);
+    return v ? {x:40+n.t*280, y:40+n.c*112} : {x:70+n.c*172, y:30+n.t*280}; };
+  const edges = el("g",{},layer), nodes = el("g",{},layer);
+  E.forEach(([a,b],k)=>{
+    const p=pos(a), q=pos(b);
+    const d = v ? `M${p.x},${p.y+H/2} C${p.x},${(p.y+q.y)/2} ${q.x},${(p.y+q.y)/2} ${q.x},${q.y-H/2}`
+                : `M${p.x+W/2},${p.y} C${(p.x+q.x)/2},${p.y} ${(p.x+q.x)/2},${q.y} ${q.x-W/2},${q.y}`;
+    const g = el("g",{class:"eg","data-a":a,"data-b":b},edges);
+    const blue = ["bq","dfm","at"].includes(a);
+    const path = el("path",{d,pathLength:1,class:"edge"+(blue?" b":""),id:"p"+k,style:`--k:${k}`},g);
+    if(!reduce){
+      const c = el("circle",{r:3,class:"pkt"+(blue?" b":"")},g);
+      const m = el("animateMotion",{dur:(2.4+(k%3)*.4)+"s",repeatCount:"indefinite",begin:(2.2+k*.35)+"s"},c);
+      el("mpath",{href:"#p"+k},m);
+    }
+  });
+  N.forEach(n=>{
+    const {x,y}=pos(n.id);
+    const g = el("g",{class:"node",tabindex:0,"data-id":n.id,style:`--c:${n.c}`,"aria-label":n.l+(n.s?", "+n.s:"")},nodes);
+    el("rect",{x:x-W/2,y:y-H/2,width:W,height:H,rx:14},g);
+    el("text",{x,y:y-(n.s?7:0)},g).textContent=n.l;
+    if(n.s) el("text",{x,y:y+10,class:"sub"},g).textContent=n.s;
+    const on=()=>light(n.id), off=()=>unlight();
+    g.addEventListener("pointerenter",on);g.addEventListener("pointerleave",off);
+    g.addEventListener("focus",on);g.addEventListener("blur",off);
+    g.addEventListener("keydown",e=>e.key==="Escape"&&(unlight(),g.blur()));
+  });
+}
+function light(id){
+  const set = new Set([id,...walk(id,up),...walk(id,down)]);
+  dag.classList.add("hl");
+  layer.querySelectorAll(".node").forEach(n=>{const on=set.has(n.dataset.id);n.classList.toggle("lit",on);n.classList.toggle("dim",!on)});
+  layer.querySelectorAll(".eg").forEach(g=>{const on=set.has(g.dataset.a)&&set.has(g.dataset.b);g.classList.toggle("lit",on);g.classList.toggle("dim",!on);g.querySelector(".edge").classList.toggle("lit",on)});
+}
+function unlight(){
+  dag.classList.remove("hl");
+  layer.querySelectorAll(".dim,.lit").forEach(n=>n.classList.remove("dim","lit"));
+}
+build(); addEventListener("resize",build);
+
+// text equivalent for assistive tech
+document.getElementById("dagtext").innerHTML = N.map(n=>{
+  const f=up(n.id).map(i=>N.find(x=>x.id===i).l), t=down(n.id).map(i=>N.find(x=>x.id===i).l);
+  return `<li>${n.l}${n.s?" ("+n.s+")":""}${f.length?". Receives from "+f.join(", "):""}${t.length?". Feeds "+t.join(", "):""}.</li>`}).join("");
+
+// pause packets off-screen
+if(!reduce) new IntersectionObserver(([e])=>e.isIntersecting?svg.unpauseAnimations():svg.pauseAnimations()).observe(dag);
+
+// pointer parallax, 8px max (fine pointers only)
+if(!reduce && !coarse) document.getElementById("hero").addEventListener("pointermove",e=>{
+  const r=dag.getBoundingClientRect();
+  dag.style.setProperty("--px",((e.clientX/innerWidth-.5)*16).toFixed(1)+"px");
+  dag.style.setProperty("--py",((e.clientY/innerHeight-.5)*16).toFixed(1)+"px");
+});
+layer.style.transform="translate(var(--px),var(--py))";
+dag.style.setProperty("--px","0px");
+
+/* ---------- Glow: one listener on the grid ---------- */
+const grid = document.getElementById("grid"), cards=[...grid.querySelectorAll(".card")];
+function glow(cx,cy,hover){
+  cards.forEach(c=>{
+    const r=c.getBoundingClientRect();
+    const dx=Math.max(r.left-cx,0,cx-r.right), dy=Math.max(r.top-cy,0,cy-r.bottom);
+    const near=Math.max(0,1-Math.hypot(dx,dy)/260);
+    c.style.setProperty("--mx",(cx-r.left)+"px");c.style.setProperty("--my",(cy-r.top)+"px");
+    c.style.setProperty("--near",near.toFixed(2));
+    c.classList.toggle("hov",hover&&cx>=r.left&&cx<=r.right&&cy>=r.top&&cy<=r.bottom);
+  });
+}
+if(!coarse){
+  grid.addEventListener("pointermove",e=>glow(e.clientX,e.clientY,true));
+  grid.addEventListener("pointerleave",()=>cards.forEach(c=>{c.style.setProperty("--near",0);c.classList.remove("hov")}));
+}else{
+  const hold=()=>{ // touch: the card nearest viewport centre holds the light
+    const mid=innerHeight/2;let best=null,bd=1e9;
+    cards.forEach(c=>{const r=c.getBoundingClientRect(),d=Math.abs((r.top+r.bottom)/2-mid);if(d<bd){bd=d;best=c}});
+    cards.forEach(c=>{c.style.setProperty("--near",c===best?1:0);c.classList.toggle("hov",c===best);if(c===best){c.style.setProperty("--mx","50%");c.style.setProperty("--my","30%")}});
+  };
+  addEventListener("scroll",()=>requestAnimationFrame(hold),{passive:true});hold();
+}
+
+/* ---------- Scroll: light fields, reveal ---------- */
+addEventListener("scroll",()=>document.documentElement.style.setProperty("--scroll",Math.min(scrollY/innerHeight,3).toFixed(3)),{passive:true});
+const io = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);if(e.target.classList.contains("B"))runB()}}),{threshold:.2});
+cards.forEach(c=>io.observe(c));
+
+/* ---------- Card B: stages turn green in sequence, counter runs once ---------- */
+const stages=["Extract","Clean","Transform","Load","Validate"];
+const tasks=document.getElementById("tasks");
+tasks.innerHTML=stages.map((s,i)=>`${i?'<span class="e"></span>':""}<span class="task"><i></i>${s}</span>`).join("");
+function runB(){
+  const t=[...tasks.querySelectorAll(".task")], out=document.getElementById("count");
+  if(reduce){t.forEach(x=>x.classList.add("ok"));out.textContent="40%";return}
+  t.forEach((x,i)=>setTimeout(()=>x.classList.add("ok"),500+i*320));
+  const t0=performance.now();(function f(n){const p=Math.min((n-t0)/1400,1);out.textContent=Math.round(40*(1-Math.pow(1-p,3)))+"%";p<1&&requestAnimationFrame(f)})(t0);
+}
+
+/* ---------- Card C: sheen + 3° tilt ---------- */
+if(!reduce&&!coarse)document.querySelectorAll(".cert").forEach(c=>{
+  c.addEventListener("pointermove",e=>{const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    c.style.setProperty("--sx",(x*100)+"%");c.style.setProperty("--ty",((x-.5)*6)+"deg");c.style.setProperty("--tx",((.5-y)*6)+"deg")});
+  c.addEventListener("pointerleave",()=>{c.style.setProperty("--tx","0deg");c.style.setProperty("--ty","0deg")});
+});
+</script>
+</body>
+</html>

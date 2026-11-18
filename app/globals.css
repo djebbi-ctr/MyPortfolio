@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+@theme {
+  --color-obsidian: #05070b;
+  --color-ink: #e6edf3;
+  --color-mute: #94a3b8;
+  --color-signal: #22d3ee;
+  --color-current: #3b82f6;
+  --color-run: #2dd4bf;
+  --color-glass: rgba(148, 163, 184, 0.05);
+  --color-hairline: rgba(255, 255, 255, 0.08);
+  --font-sans: var(--font-mona), system-ui, sans-serif;
+  --font-arabic: var(--font-plex-ar), var(--font-mona), sans-serif;
+  --font-mono: var(--font-code), ui-monospace, monospace;
+  --radius-card: 28px;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  color-scheme: dark;
+  --px: 0px;
+  --py: 0px;
+  --scroll: 0;
+}
+
+html { background: var(--color-obsidian); }
+body {
+  background: var(--color-obsidian);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  font-stretch: 100%;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: clip; }
+
+:focus-visible { outline: 2px solid var(--color-signal); outline-offset: 3px; border-radius: 8px; }
+::selection { background: rgba(34, 211, 238, 0.28); }
+
+/* ---------- depth: blueprint grid, light fields, grain ---------- */
+.bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+.bg-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 35%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 35%, #000 20%, transparent 75%);
+}
+.bg-field { position: absolute; width: 60vw; height: 60vw; border-radius: 50%; filter: blur(110px); opacity: 0.09; will-change: transform; animation: fadefield 1.2s var(--ease-out-expo) both; }
+.bg-f1 { background: var(--color-signal); inset-inline-start: -15vw; top: -20vw; transform: translateY(calc(var(--scroll) * -40px)); }
+.bg-f2 { background: var(--color-current); inset-inline-end: -20vw; top: 10vw; transform: translateY(calc(var(--scroll) * 30px)); }
+.bg-grain {
+  position: absolute; inset: 0; opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@keyframes fadefield { from { opacity: 0; } to { opacity: 0.09; } }
+
+/* ---------- hero intro (CSS only, so text never waits on JS) ---------- */
+.hero-line { display: block; overflow: hidden; padding-bottom: 0.08em; }
+.hero-line > span { display: block; transform: translateY(105%); animation: rise 0.8s var(--ease-out-expo) forwards; animation-delay: calc(0.2s + var(--i) * 0.07s); }
+@keyframes rise { to { transform: none; } }
+.intro { opacity: 0; transform: translateY(12px); animation: introup 0.6s var(--ease-out-expo) forwards; animation-delay: var(--d, 0.5s); }
+@keyframes introup { to { opacity: 1; transform: none; } }
+
+/* ---------- glass card + one-system glow ---------- */
+.card {
+  position: relative; isolation: isolate; overflow: hidden;
+  border-radius: var(--radius-card);
+  padding: var(--pad, 28px);
+  background: var(--color-glass);
+  border: 1px solid var(--color-hairline);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+}
+.card::before { /* border light, strongest nearest the pointer */
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), rgba(34, 211, 238, 0.85), transparent 65%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: var(--near, 0); transition: opacity 0.2s;
+}
+.card::after { /* inner fill light, brighter on the hovered card */
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 50%), rgba(34, 211, 238, 0.09), transparent 65%);
+  opacity: calc(var(--near, 0) * var(--hov, 0.5));
+}
+.card[data-hov="1"] { --hov: 1; }
+.card-open { cursor: pointer; }
+.card h2 { font-size: 1.5625rem; line-height: 1.15; letter-spacing: -0.02em; font-weight: 600; font-stretch: 106%; max-inline-size: 22ch; text-wrap: balance; }
+.card p { color: var(--color-mute); max-inline-size: 62ch; }
+.card p b { color: var(--color-ink); font-weight: 560; }
+
+/* card A: edges light up in sequence on hover */
+.mini-edge { position: relative; display: block; width: 22px; height: 2px; overflow: hidden; background: rgba(148, 163, 184, 0.3); }
+.mini-edge::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--color-signal), transparent); transform: translateX(-100%); }
+.card:hover .mini-edge::after, .card:focus-within .mini-edge::after { animation: sweep 0.9s var(--ease-out-expo) forwards; animation-delay: calc(var(--s) * 110ms); }
+@keyframes sweep { to { transform: translateX(100%); } }
+
+/* ---------- Living DAG ---------- */
+.dag svg { width: 100%; height: auto; overflow: visible; }
+.dag-layer { transform: translate(var(--px), var(--py)); transition: transform 0.35s var(--ease-out-expo); }
+.edge { fill: none; stroke: var(--color-mute); stroke-opacity: 0.35; stroke-width: 1.5; stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1s var(--ease-out-expo) forwards; animation-delay: calc(var(--d0, 0.9s) + var(--k) * 0.04s); transition: stroke-opacity 0.25s; }
+.edge.b { stroke: var(--color-current); stroke-opacity: 0.55; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.dnode { opacity: 0; animation: introup 0.5s var(--ease-out-expo) forwards; animation-delay: calc(var(--d0, 0.8s) + var(--c) * 0.12s); transition: opacity 0.25s; }
+.dnode rect { fill: #0c121b; stroke: rgba(255, 255, 255, 0.12); stroke-width: 1; transition: stroke 0.2s; }
+.dnode text { fill: var(--color-ink); font: 500 12.5px var(--font-sans); text-anchor: middle; dominant-baseline: central; }
+.dnode text.sub { fill: var(--color-mute); font-size: 10.5px; }
+.dnode:focus { outline: none; }
+.dnode:focus-visible rect { stroke: var(--color-signal); stroke-width: 2; }
+.dnode.lit rect { stroke: var(--color-signal); }
+.dag[data-hl="1"] .dim { opacity: 0.18 !important; }
+.dag[data-hl="1"] .edge.lit { stroke: var(--color-signal); stroke-opacity: 0.95; }
+.pkt { fill: var(--color-signal); } .pkt.b { fill: #7fb0ff; }
+.dag[data-hl="1"] .eg:not(.lit) .pkt { opacity: 0; }
+.sr-only-list { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* ---------- stack marquee mask ---------- */
+.fade-x { -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+
+/* ---------- command palette (cmdk) ---------- */
+[cmdk-overlay] { position: fixed; inset: 0; z-index: 80; background: rgba(2, 4, 8, 0.7); }
+[cmdk-dialog] { position: fixed; z-index: 90; inset-inline: 0; margin-inline: auto; top: 16vh; inline-size: min(560px, calc(100% - 32px)); border-radius: 20px; background: #0a0f17; border: 1px solid rgba(255, 255, 255, 0.12); padding: 8px; }
+[cmdk-input] { inline-size: 100%; background: transparent; border: 0; outline: none; color: var(--color-ink); font: inherit; padding: 12px 14px; border-block-end: 1px solid var(--color-hairline); }
+[cmdk-list] { max-block-size: 320px; overflow: auto; padding-block-start: 8px; }
+[cmdk-group-heading] { padding: 8px 14px 4px; font-size: 0.8rem; color: var(--color-mute); }
+[cmdk-item] { display: flex; align-items: center; gap: 10px; min-block-size: 44px; padding: 0 14px; border-radius: 12px; cursor: pointer; color: var(--color-ink); }
+[cmdk-item][data-selected="true"] { background: rgba(34, 211, 238, 0.12); }
+[cmdk-empty] { padding: 16px 14px; color: var(--color-mute); }
+
+/* ---------- reduced motion: finished, not frozen ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; transition-duration: 0.15s !important; scroll-behavior: auto !important; }
+  .hero-line > span { transform: none; }
+  .intro, .dnode { opacity: 1; transform: none; }
+  .edge { stroke-dashoffset: 0; }
+  .pkt { display: none; }
+  .bg-f1, .bg-f2 { transform: none; }
+}
