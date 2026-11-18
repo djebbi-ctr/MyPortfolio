@@ -51,7 +51,7 @@ export const hero = {
 };
 
 export const certs = [
-  { name: "Professional Data Engineer", issuer: "Google Cloud", short: "Google Cloud Professional Data Engineer", url: null as string | null },
+  { name: "Professional Data Engineer", issuer: "Google Cloud", short: "Google Cloud Professional Data Engineer", url: "https://www.credly.com/badges/e96a9f4e-c27a-4c7f-9c3b-ab623a23db8f" as string | null },
   { name: "SnowPro Core", issuer: "Snowflake", short: "SnowPro Core", url: null as string | null },
   { name: "SnowPro Advanced: Data Engineer", issuer: "Snowflake", short: "SnowPro Advanced: Data Engineer", url: null as string | null },
 ];
