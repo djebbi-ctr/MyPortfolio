@@ -14,7 +14,7 @@ export const profile = {
   links: {
     email: "djebbifiras89@gmail.com",
     linkedin: "https://www.linkedin.com/in/djebbi-firas" as string | null,
-    github: null as string | null, // not supplied yet
+    github: "https://github.com/djebbi-ctr" as string | null,
     cv: "/Firas-Djebbi-CV.pdf" as string | null,
   },
 };
